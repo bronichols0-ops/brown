@@ -1,6 +1,7 @@
 #include "main.h"
 #include "pros/misc.h"
 #include "subsystems.hpp"
+#include "computer.hpp"
 
 
 /////
@@ -27,18 +28,7 @@ ez::tracking_wheel horiz_tracker(18, 1, 2.0);  // This tracking wheel is perpend
 //ez::tracking_wheel vert_tracker(16, 1, 1.0);   // This tracking wheel is parallel to the drive wheels
 
 // TASK MANAGER
-int control_lift(){
-  while (false){
-    float output =set_lift(liftPosition);
-    // Set motor voltage
-    llift.move(output);
-    rlift.move(output);
 
-    pros::delay(50);
-
-  }
-  return 1;
-}
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -91,16 +81,16 @@ void initialize() {
       {"Measure Offsets\n\nThis will turn the robot a bunch of times and calculate your offsets for your tracking wheels.", measure_offsets},
   });
 
-  // Initialize chassis and auton selector
-  llift.tare_position();
-  rlift.tare_position();
-//  liftpid.exit_condition_set(80, 50, 300, 150, 500, 500);
-  rotator.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+  wristMotor.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   chassis.initialize();
   ez::as::initialize();
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
-
-  pros::Task CONTROL_LIFT(control_lift);
+  start_task_manager();
+  lift.set_zero_position_all(0);
+	wristMotor.set_zero_position(0);
+  lift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	lift.set_zero_position(0);
 }
 
 /**
@@ -274,8 +264,7 @@ void opcontrol() {
    
     chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
     intake_opcontrol();
-    lift_driver();
-    rotator_driver();
+    
     
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
