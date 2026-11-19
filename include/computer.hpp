@@ -9,3 +9,6 @@
 void setLiftPos(short position);
 float controlLift(float setPoint);
 void start_task_manager();
+void updateLift();
+void updateClaw();
+void updateIntake();

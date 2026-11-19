@@ -23,7 +23,7 @@ struct Pid_Tuning {
   float kD;
 };
 
-inline short liftPosition = 0; // start at 0
+// start at 0
 inline float set_lift(int setPoint) {
   float kp = 1.0;
 

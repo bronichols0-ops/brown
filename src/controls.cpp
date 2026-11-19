@@ -1,4 +1,4 @@
-#include "main.h"
+
 #include "pros/misc.h"
 #include "subsystems.hpp"
 #include "computer.hpp"
@@ -9,7 +9,7 @@ void updateLift(){
         // Move to the selected lift preset.
         usingLift =false;
         wristPosition = -970 * 2;
-        liftPosition = 360;
+        liftPosition = 440;
     } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
         // Raise lift
         lift.move(127);
@@ -18,15 +18,11 @@ void updateLift(){
         usingLift = true;
         return;
     } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
-        // Lower lift if not all the way lowered
-       /* if (liftLimit.get_value()==1){
-            lift.brake();
-        } else {
-            lift.move(-127);
-            liftPosition = lift.get_position();
-            usingLift = true;
-            return;
-        }*/
+        // Lower the lift while the button is held.
+        lift.move(-127);
+        liftPosition = lift.get_position();
+        usingLift = true;
+        return;
     } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)){
         wristPosition = -300;
 

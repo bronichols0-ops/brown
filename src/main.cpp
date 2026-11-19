@@ -25,7 +25,7 @@ ez::Drive chassis(
 // - `2.75` is the wheel diameter
 // - `4.0` is the distance from the center of the wheel to the center of the robot
 ez::tracking_wheel horiz_tracker(18, 1, 2.0);  // This tracking wheel is perpendicular to the drive wheels
-//ez::tracking_wheel vert_tracker(16, 1, 1.0);   // This tracking wheel is parallel to the drive wheels
+ez::tracking_wheel vert_tracker(7, 1, 3.0);   // This tracking wheel is parallel to the drive wheels
 
 // TASK MANAGER
 
@@ -49,7 +49,7 @@ void initialize() {
   // Look at your vertical tracking wheel and decide if it's to the left or right of the center of the robot
   //  - change `left` to `right` if the tracking wheel is to the right of the centerline
   //  - ignore this if you aren't using a vertical tracker
-  //chassis.odom_tracker_left_set(&vert_tracker);
+  chassis.odom_tracker_left_set(&vert_tracker);
 
   // Configure your chassis controls
   chassis.opcontrol_curve_buttons_toggle(true);   // Enables modifying the controller curve with buttons on the joysticks
@@ -265,7 +265,9 @@ void opcontrol() {
     chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
     intake_opcontrol();
     
-    
+    updateLift();
+			updateClaw();
+			updateIntake();
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
