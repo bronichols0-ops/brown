@@ -1,3 +1,4 @@
+#include "computer.hpp"
 #include "main.h" // IWYU pragma: keep   
 
 
@@ -12,6 +13,22 @@
 const int DRIVE_SPEED = 110;
 const int TURN_SPEED = 90;
 const int SWING_SPEED = 110;
+
+static bool wait_for_lift(float target, uint32_t timeout_ms = 2000) {
+  const uint32_t start = pros::millis();
+  while (pros::millis() - start < timeout_ms) {
+    const float position = lift.get_position();
+    if (position >= target - 5 && position <= target + 5) {
+      return true;
+    }
+    pros::delay(20);
+  }
+
+  liftPosition = lift.get_position();
+  lift.brake();
+  printf("Lift timed out at %.1f; target was %.1f\n", lift.get_position(), target);
+  return false;
+}
 
 ///
 // Constants
@@ -78,6 +95,7 @@ void drive_example() {
   claw.move(-127);
   pros::delay(400);
   wristPosition = 0;
+  pros::delay(150);
   claw.move(127);
   intake.move(127);
   wristPosition = 0;
@@ -88,12 +106,50 @@ void drive_example() {
   chassis.pid_turn_set(-135_deg, 90);
   chassis.pid_wait();
 
-  chassis.pid_drive_set(20_in, 127);
+  chassis.pid_drive_set(23_in, 127);
   chassis.pid_wait();
 
+  chassis.pid_drive_set(-8_in, 127);
+  chassis.pid_wait();
   
+  chassis.pid_turn_set(135_deg, 90);
+  chassis.pid_wait();
 
+  chassis.pid_drive_set(16_in, 127);
+  chassis.pid_wait();
+
+  chassis.pid_turn_set(-125_deg, 90);
+  chassis.pid_wait();
+
+  intake.move(0);
+  wristPosition = -970 * 2;
+  liftPosition = 440;
+  if (!wait_for_lift(440)) return;
+  intake.move(127);
+
+
+  chassis.pid_drive_set(-20_in, 127);
+  chassis.pid_wait();
+wristPosition = -940;
+  liftPosition = 570;
+  
+  if (!wait_for_lift(570)) return;
+
+chassis.pid_drive_set(-9, 127);
+chassis.pid_wait();
+
+  liftPosition = 400;
+  if (!wait_for_lift(400)) return;
+  claw.move(-127);
+  
+  liftPosition = 600;
+
+  chassis.pid_drive_set(5_in, 127);
+
+  liftPosition = 440;
+  wristPosition = 1800;
 }
+
 
 ///
 // Turn Example
@@ -362,7 +418,7 @@ void measure_offsets() {
     chassis.pid_targets_reset();
     chassis.drive_imu_reset();
     chassis.drive_sensor_reset();
-    chassis.drive_brake_set(MOTOR_BRAKE_HOLD);
+    //chassis.drive_brake_set(MOTOR_BRAKE_HOLD);
     chassis.odom_xyt_set(0_in, 0_in, 0_deg);
     double imu_start = chassis.odom_theta_get();
     double target = i % 2 == 0 ? 90 : 270;  // Switch the turn target every run from 270 to 90

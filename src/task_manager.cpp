@@ -5,17 +5,16 @@
 
 
 int lift_controller(){
-    while (false){
-        while (!usingLift){
-            // Get pid output
+    while (true){
+        if (pros::competition::is_autonomous() && !pros::competition::is_disabled()){
             float output = controlLift(liftPosition);
-            // Set motor power
-             lift.move(output);
-        
-
-            // Delay lets robot use resources somewhere else
-            pros::delay(50);
+            if (output == 0) {
+                lift.brake();
+            } else {
+                lift.move(static_cast<int>(output));
+            }
         }
+        pros::delay(20);
     }
 
     return 0;
